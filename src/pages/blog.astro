@@ -1,9 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import PostList from '../components/PostList.astro';
 
 const allPosts = await getCollection('posts');
-console.log(allPosts);
+// console.log(allPosts);
 ---
 
 <Layout title='Blog - My Astro Blog'>
@@ -12,8 +13,6 @@ console.log(allPosts);
     <p class='text-zinc-900 text-2xl mb-24 max-sm:mb-14'>
       Join the community and learn from Music Producers and Enthusiasts
     </p>
-    <p>
-      {allPosts.map((post) => <h2>{post.data.title}</h2>)}
-    </p>
+    <PostList posts={allPosts} />
   </main>
 </Layout>
