@@ -7,6 +7,7 @@ import H1 from '../../components/H1.astro';
 import type { CollectionEntry } from 'astro:content';
 import PostList from '../../components/PostList.astro';
 import Pagination from '../../components/Pagination.astro';
+import CategoryList from '../../components/CategoryList.astro';
 
 export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
   const allPosts = await getCollection('posts');
@@ -20,6 +21,8 @@ type Props = {
 const { page } = Astro.props;
 // console.log(page);
 const posts = page.data as CollectionEntry<'posts'>[];
+const allCategories = posts.flatMap((post) => post.data.categories);
+const categories = Array.from(new Set(allCategories));
 ---
 
 <Layout
@@ -31,6 +34,12 @@ const posts = page.data as CollectionEntry<'posts'>[];
     <p class='text-zinc-900 text-2xl mb-24 max-sm:mb-14'>
       Join the community and learn from Music Producers and Enthusiasts
     </p>
+    <div
+      class='grid grid-cols-[auto,1fr] gap-x-14 gap-y-3 mb-16 max-lg:grid-cols-1'
+    >
+      <h2 class='font-bold text-5xl text-teal-900'>Tags</h2>
+      <CategoryList categories={categories} />
+    </div>
     <div class='mb-12'>
       <Pagination prevURL={page.url.prev} nextURL={page.url.next} />
     </div>
