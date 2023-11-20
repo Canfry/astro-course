@@ -48,18 +48,15 @@ const { category, posts } = Astro.props;
     <p class='text-zinc-900 text-2xl mb-24 max-sm:mb-14'>
       Join the community and learn from Music Producers and Enthusiasts
     </p>
-    <div
-      class='grid grid-cols-[auto,1fr] gap-x-14 gap-y-3 mb-16 max-lg:grid-cols-1'
-    >
-      <h2 class='font-bold text-5xl text-teal-900'>Posts tagged:</h2>
-      <CategoryList categories={[category]} />
-    </div>
-    <div class='mb-12'>
+
+    <CategoryList categories={[category]} title='Posts Tagged' />
+
+    <!-- <div class='mb-12'>
       <Pagination nextURL='/blog/2' />
-    </div>
+    </div> -->
     <PostList posts={posts} />
-    <div class='mb-36'>
+    <!-- <div class='mb-36'>
       <Pagination nextURL='/blog/2' />
-    </div>
+    </div> -->
   </Main>
 </Layout>
