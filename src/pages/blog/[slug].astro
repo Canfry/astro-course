@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Main from '../../components/Main.astro';
 import H1 from '../../components/H1.astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import TableOfContent from '../../components/tableOfContent.astro';
 import Share from '../../components/Share.astro';
 
@@ -29,12 +29,13 @@ interface Props {
 
 const { post } = Astro.props;
 const { Content, headings } = await post.render();
+const coverImageSource = (await getImage({ src: post.data.image })).src;
 ---
 
 <Layout
   title={post.data.title}
   description={post.data.description}
-  image={post.data.image.src}
+  image={coverImageSource}
 >
   <Main>
     <a href='/blog' class='text-zinc-500 text-2xl mb-16 underline block'
