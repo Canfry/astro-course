@@ -23,9 +23,9 @@ export const getStaticPaths = async () => {
   return paths;
 };
 
-type Props = {
+interface Props {
   post: CollectionEntry<'posts'>;
-};
+}
 
 const { post } = Astro.props;
 const { Content, headings } = await post.render();
@@ -44,6 +44,8 @@ const { Content, headings } = await post.render();
     <Image
       src={post.data.image}
       alt={post.data.title}
+      width={1024}
+      height={1024}
       class='rounded-2xl shadow-xl mb-28 aspect-thumbnail object-cover'
     />
     <div class='mb-10'>
