@@ -7,6 +7,7 @@ import { Image, getImage } from 'astro:assets';
 import TableOfContent from '../../components/tableOfContent.astro';
 import Share from '../../components/Share.astro';
 import PostMeta from '../../components/PostMeta.astro';
+import { getThumbnail } from '../../cloudinary';
 
 // export const getStaticPaths = async () => {
 //   const posts = await getCollection('posts');
@@ -36,7 +37,7 @@ if (!post) {
   return Astro.redirect('/404');
 }
 const { Content, headings } = await post.render();
-const coverImageSource = (await getImage({ src: post.data.image })).src;
+const coverImageSource = getThumbnail(post.data.title);
 ---
 
 <Layout
