@@ -7,7 +7,13 @@ import H1 from '../components/H1.astro';
 import Pagination from '../components/Pagination.astro';
 import CategoryList from '../components/CategoryList.astro';
 
-const posts = (await getCollection('posts')).slice(0, 4);
+const page = Number(Astro.url.searchParams.get('page')) || 1;
+const postsPerPage = Number(import.meta.env.POSTS_PER_PAGE);
+const start = postsPerPage * (page - 1);
+const end = start + postsPerPage;
+
+const allPosts = await getCollection('posts');
+const posts = allPosts.slice(start, end);
 // console.log(allPosts);
 const allCategories = posts.flatMap((post) => post.data.categories);
 const categories = Array.from(new Set(allCategories));
@@ -26,11 +32,11 @@ const categories = Array.from(new Set(allCategories));
     <CategoryList categories={categories} title='Tags' />
 
     <div class='mb-12'>
-      <Pagination nextURL='/blog/2' />
+      <Pagination page={page} numberOfPosts={allPosts.length} />
     </div>
     <PostList posts={posts} />
     <div class='mb-36'>
-      <Pagination nextURL='/blog/2' />
+      <Pagination page={page} numberOfPosts={allPosts.length} />
     </div>
   </Main>
 </Layout>

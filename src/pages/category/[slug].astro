@@ -1,39 +1,46 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CategoryList from '../../components/CategoryList.astro';
 import H1 from '../../components/H1.astro';
 import Main from '../../components/Main.astro';
 import Pagination from '../../components/Pagination.astro';
 import PostList from '../../components/PostList.astro';
-export const getStaticPaths = async () => {
-  const posts = await getCollection('posts');
-  const allCategories = posts.flatMap((post) => post.data.categories);
-  const categories = Array.from(new Set(allCategories));
 
-  const paths = categories.map((category) => {
-    const postsByCategory = posts.filter((post) =>
-      post.data.categories.includes(category)
-    );
-    return {
-      params: {
-        slug: category,
-      },
-      props: {
-        category,
-        posts: postsByCategory,
-      },
-    };
-  });
-  return paths;
-};
+// export const getStaticPaths = async () => {
+//   const posts = await getCollection('posts');
+//   const allCategories = posts.flatMap((post) => post.data.categories);
+//   const categories = Array.from(new Set(allCategories));
 
-type Props = {
-  category: string;
-  posts: CollectionEntry<'posts'>[];
-};
+//   const paths = categories.map((category) => {
+//     const postsByCategory = posts.filter((post) =>
+//       post.data.categories.includes(category)
+//     );
+//     return {
+//       params: {
+//         slug: category,
+//       },
+//       props: {
+//         category,
+//         posts: postsByCategory,
+//       },
+//     };
+//   });
+//   return paths;
+// };
 
-const { category, posts } = Astro.props;
+// type Props = {
+//   category: string;
+//   posts: CollectionEntry<'posts'>[];
+// };
+
+// const { category, posts } = Astro.props;
+
+const category = Astro.params.slug as string;
+const allPosts = await getCollection('posts');
+const posts = allPosts.filter((post) =>
+  post.data.categories.includes(category)
+);
 ---
 
 <Layout
@@ -54,7 +61,14 @@ const { category, posts } = Astro.props;
     <!-- <div class='mb-12'>
       <Pagination nextURL='/blog/2' />
     </div> -->
-    <PostList posts={posts} />
+    {
+      posts.length === 0 ? (
+        <p class='text-2xl'>No posts found with that tag</p>
+      ) : (
+        <PostList posts={posts} />
+      )
+    }
+
     <!-- <div class='mb-36'>
       <Pagination nextURL='/blog/2' />
     </div> -->
