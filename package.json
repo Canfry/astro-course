@@ -18,6 +18,7 @@
     "@fontsource/cabin": "^5.0.15",
     "@types/markdown-it": "^13.0.6",
     "@types/sanitize-html": "^2.9.4",
+    "@xata.io/client": "^0.28.0",
     "astro": "^3.5.5",
     "date-fns": "^2.30.0",
     "markdown-it": "^13.0.2",
