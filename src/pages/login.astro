@@ -40,7 +40,9 @@ if (Astro.request.method === 'POST') {
         httpOnly: true,
         secure: true,
       });
-      return Astro.redirect('/', 302);
+
+      const redirect = Astro.url.searchParams.get('redirect') ?? '/';
+      return Astro.redirect(redirect, 302);
     }
   }
 }
