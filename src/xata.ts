@@ -30,6 +30,10 @@ const tables = [
       { name: "date", type: "datetime", notNull: true, defaultValue: "now" },
     ],
   },
+  {
+    name: "subscribers",
+    columns: [{ name: "email", type: "email", unique: true }],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -41,9 +45,13 @@ export type UsersRecord = Users & XataRecord;
 export type Comments = InferredTypes["comments"];
 export type CommentsRecord = Comments & XataRecord;
 
+export type Subscribers = InferredTypes["subscribers"];
+export type SubscribersRecord = Subscribers & XataRecord;
+
 export type DatabaseSchema = {
   users: UsersRecord;
   comments: CommentsRecord;
+  subscribers: SubscribersRecord;
 };
 
 const DatabaseClient = buildClient();
