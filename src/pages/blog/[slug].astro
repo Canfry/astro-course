@@ -3,40 +3,47 @@ import { getEntryBySlug } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Main from '../../components/Main.astro';
 import H1 from '../../components/H1.astro';
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import TableOfContent from '../../components/tableOfContent.astro';
 import Share from '../../components/Share.astro';
 import PostMeta from '../../components/PostMeta.astro';
 import { getThumbnail } from '../../cloudinary';
 import CommentForm from '../../components/CommentForm.astro';
+import { XataClient } from '../../xata';
+import CommentList from '../../components/CommentList.astro';
 
-// export const getStaticPaths = async () => {
-//   const posts = await getCollection('posts');
-
-//   const paths = posts.map((post) => {
-//     return {
-//       params: {
-//         slug: post.slug,
-//       },
-//       props: {
-//         post,
-//       },
-//     };
-//   });
-//   return paths;
-// };
-
-// interface Props {
-//   post: CollectionEntry<'posts'>;
-// }
-
-// const { post } = Astro.props;
 const { slug } = Astro.params;
-const post = await getEntryBySlug('posts', slug as string);
 
+const xata = new XataClient({ apiKey: import.meta.env.XATA_API_KEY });
+
+if (Astro.request.method === 'POST') {
+  const user = Astro.cookies.get('userId');
+
+  if (!user) {
+    return Astro.redirect('/login ');
+  }
+
+  const data = await Astro.request.formData();
+  const comment = data.get('comment') as string;
+
+  await xata.db.comments.create({
+    post: slug,
+    text: comment,
+    date: new Date(),
+    user: user.value,
+  });
+}
+
+const post = await getEntryBySlug('posts', slug as string);
 if (!post) {
   return Astro.redirect('/404');
 }
+
+const comments = await xata.db.comments
+  .select(['id', 'text', 'date', 'user.name'])
+  .filter({ post: post.slug })
+  .getMany();
+
 const { Content, headings } = await post.render();
 const coverImageSource = getThumbnail(post.data.title);
 ---
@@ -78,11 +85,14 @@ const coverImageSource = getThumbnail(post.data.title);
           <span class='font-bold text-teal-900 text-4xl mr-12'>Comments</span>
           <span
             class='border border-teal-900 text-teal-900 rounded-full px-4 py-2 font-bold text-xl'
-            >3</span
+            >{comments.length}</span
           >
         </h2>
       </div>
-      <CommentForm />
+      <div class='mb-14'>
+        <CommentForm />
+      </div>
+      <CommentList comments={comments} />
     </div>
   </div>
 </Layout>
