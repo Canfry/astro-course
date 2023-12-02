@@ -15,7 +15,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     });
     return redirect('/newsletter/success', 307);
   } catch (error: any) {
-    console.log(error);
     if (
       error?.errors[0]?.message ===
       'invalid record: column [email]: is not unique'
