@@ -1,0 +1,38 @@
+---
+const user = Astro.cookies.get('userId');
+---
+
+{
+  user?.value ? (
+    <form
+      method='POST'
+      class='grid grid-cols-[1fr, auto] gap-x-3 gap-y-2 items-end max-md:grid-cols-1'
+    >
+      <div class='flex flex-col'>
+        <label for='comment' class='text-zinc-900 text-2xl mb-2'>
+          Leave a comment
+        </label>
+        <input
+          type='text'
+          name='comment'
+          id='comment'
+          class='border border-teal-900 rouded-lg text-2xl px-6 py-6'
+        />
+      </div>
+      <button
+        type='submit'
+        class='text-white text-2xl bg-teal-900 w-full rounded-lg px-6 py-3 my-1'
+      >
+        Add comment
+      </button>
+    </form>
+  ) : (
+    <p class='text-zinc-900 text-2xl mt-4 mb-24'>
+      Please{' '}
+      <a href='/login' class='text-teal-900 underline'>
+        login
+      </a>{' '}
+      to commment.
+    </p>
+  )
+}

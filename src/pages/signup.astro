@@ -1,0 +1,81 @@
+---
+import H1 from '../components/H1.astro';
+import Main from '../components/Main.astro';
+import Layout from '../layouts/Layout.astro';
+import { XataClient } from '../xata';
+import bcrypt from 'bcryptjs';
+
+// Handle form submission
+if (Astro.request.method === 'POST') {
+  const xata = new XataClient({ apiKey: import.meta.env.XATA_API_KEY });
+
+  const data = await Astro.request.formData();
+  const name = data.get('name') as string;
+  const email = data.get('email') as string;
+  const password = data.get('password') as string;
+
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+
+  const user = await xata.db.users.create({
+    name,
+    email,
+    password: hash,
+  });
+
+  // Set cookies
+  Astro.cookies.set('userId', user.id, {
+    httpOnly: true,
+    secure: true,
+  });
+  Astro.cookies.set('userName', user.name, {
+    httpOnly: true,
+    secure: true,
+  });
+  Astro.cookies.set('userEmail', user.email, {
+    httpOnly: true,
+    secure: true,
+  });
+
+  return Astro.redirect('/', 302);
+}
+---
+
+<Layout title='Sign up'>
+  <Main>
+    <H1 text='Sign Up' />
+    <form method='POST'>
+      <label for='name' class='mb-2 block text-teal-900'>Full Name</label>
+      <input
+        type='text'
+        id='name'
+        name='name'
+        class='border-teal-900 border w-full mb-10 rounded-lg px-6 py-3'
+      />
+      <label for='email' class='mb-2 block text-teal-900'>Email</label>
+      <input
+        type='email'
+        id='email'
+        name='email'
+        class='border-teal-900 border w-full mb-10 rounded-lg px-6 py-3'
+      />
+      <label for='password' class='mb-2 block text-teal-900'>Password</label>
+      <input
+        type='password'
+        id='password'
+        name='password'
+        class='border-teal-900 border w-full mb-10 rounded-lg px-6 py-3'
+      />
+      <button
+        type='submit'
+        class='text-white text-2xl bg-teal-900 w-full rounded-lg px-6 py-3 mb-11'
+        >Sign Up</button
+      >
+    </form>
+    <p>
+      Already have an account? <a href='/login' class='text-teal-900 underline'
+        >Login</a
+      >
+    </p>
+  </Main>
+</Layout>
