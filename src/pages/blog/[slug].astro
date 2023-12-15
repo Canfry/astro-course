@@ -76,7 +76,7 @@ const coverImageSource = getThumbnail(post.data.title);
       </div>
       <Share post={post} />
     </div>
-    <EmojiReactions />
+    <EmojiReactions post={post.slug} />
   </Main>
   <div
     class='bg-teal-100/30 py-14 px-24 relative border-b border-teal-900 mt-44'

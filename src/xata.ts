@@ -19,7 +19,10 @@ const tables = [
         defaultValue: "dev@dev.com",
       },
     ],
-    revLinks: [{ column: "user", table: "comments" }],
+    revLinks: [
+      { column: "user", table: "comments" },
+      { column: "user", table: "reactions" },
+    ],
   },
   {
     name: "comments",
@@ -33,6 +36,14 @@ const tables = [
   {
     name: "subscribers",
     columns: [{ name: "email", type: "email", unique: true }],
+  },
+  {
+    name: "reactions",
+    columns: [
+      { name: "emoji", type: "string", notNull: true, defaultValue: "star" },
+      { name: "post", type: "string", notNull: true, defaultValue: "null" },
+      { name: "user", type: "link", link: { table: "users" } },
+    ],
   },
 ] as const;
 
@@ -48,10 +59,14 @@ export type CommentsRecord = Comments & XataRecord;
 export type Subscribers = InferredTypes["subscribers"];
 export type SubscribersRecord = Subscribers & XataRecord;
 
+export type Reactions = InferredTypes["reactions"];
+export type ReactionsRecord = Reactions & XataRecord;
+
 export type DatabaseSchema = {
   users: UsersRecord;
   comments: CommentsRecord;
   subscribers: SubscribersRecord;
+  reactions: ReactionsRecord;
 };
 
 const DatabaseClient = buildClient();
