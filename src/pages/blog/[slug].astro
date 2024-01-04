@@ -1,0 +1,100 @@
+---
+import { getEntryBySlug } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Main from '../../components/Main.astro';
+import H1 from '../../components/H1.astro';
+import { Image } from 'astro:assets';
+import TableOfContent from '../../components/tableOfContent.astro';
+import Share from '../../components/Share.astro';
+import PostMeta from '../../components/PostMeta.astro';
+import { getThumbnail } from '../../cloudinary';
+import CommentForm from '../../components/CommentForm.astro';
+import { XataClient } from '../../xata';
+import CommentList from '../../components/CommentList.astro';
+import EmojiReactions from '../../components/EmojiReactions.svelte';
+
+const { slug } = Astro.params;
+
+const xata = new XataClient({ apiKey: import.meta.env.XATA_API_KEY });
+
+if (Astro.request.method === 'POST') {
+  const user = Astro.cookies.get('userId');
+
+  if (!user) {
+    return Astro.redirect('/login ');
+  }
+
+  const data = await Astro.request.formData();
+  const comment = data.get('comment') as string;
+
+  await xata.db.comments.create({
+    post: slug,
+    text: comment,
+    date: new Date(),
+    user: user.value,
+  });
+}
+
+const post = await getEntryBySlug('posts', slug as string);
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const comments = await xata.db.comments
+  .select(['id', 'text', 'date', 'user.name'])
+  .filter({ post: post.slug })
+  .getMany();
+
+const { Content, headings } = await post.render();
+const coverImageSource = getThumbnail(post.data.title);
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  image={coverImageSource}
+>
+  <Main>
+    <a href='/blog' class='text-zinc-500 text-2xl mb-16 underline block'
+      >&larr; Back to all blogs</a
+    >
+    <H1 text={post.data.title} />
+    <PostMeta post={post} />
+    <Image
+      src={post.data.image}
+      alt={post.data.title}
+      width={1024}
+      height={1024}
+      class='rounded-2xl shadow-xl mb-28 aspect-thumbnail object-cover'
+    />
+    <div class='mb-10'>
+      <TableOfContent headings={headings} />
+    </div>
+    <div class='relative'>
+      <div class='prose prose-2xl overflow-visible relative'>
+        <Content />
+      </div>
+      <Share post={post} />
+    </div>
+    <EmojiReactions post={post.slug} />
+  </Main>
+  <div
+    class='bg-teal-100/30 py-14 px-24 relative border-b border-teal-900 mt-44'
+  >
+    <div class='max-w-7xl mx-auto'>
+      <div id='comments' class='mb-4'>
+        <h2>
+          <span class='font-bold text-teal-900 text-4xl mr-12'>Comments</span>
+          <span
+            class='border border-teal-900 text-teal-900 rounded-full px-4 py-2 font-bold text-xl'
+            >{comments.length}</span
+          >
+        </h2>
+      </div>
+      <div class='mb-14'>
+        <CommentForm />
+      </div>
+      <CommentList comments={comments} />
+    </div>
+  </div>
+</Layout>
